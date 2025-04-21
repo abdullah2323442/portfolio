@@ -1,99 +1,637 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<title>MD Abdullah Jobayer's Portfolio</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
-	<!-- Custom CSS -->
-	<link rel="stylesheet" href="style.css">
-	<link rel="icon" href="https://i.postimg.cc/tRWQVsJY/yourbrother.png" type="image/x-icon">
-	<script>
-		const navLinks = document.querySelectorAll('.nav-link');
-		navLinks.forEach(link => {
-			link.addEventListener('click', () => {
-				navLinks.forEach(link => link.classList.remove('active'));
-				link.classList.add('active');
-			});
-		});
-	</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Abdullah Jobayer's Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://i.postimg.cc/tRWQVsJY/yourbrother.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+            transition: background 0.7s ease, color 0.7s ease;
+            perspective: 1500px;
+        }
+        body.light {
+            background: #e5e7eb;
+            color: #1a1a1a;
+        }
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            filter: blur(1px);
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.2);
+            transform: translateZ(60px);
+        }
+        body.light header {
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+        }
+        .nav-list li {
+            position: relative;
+            cursor: pointer;
+            transition: color 0.4s ease, transform 0.4s ease;
+        }
+        .nav-list li:hover, .nav-list li.active {
+            color: #00ffcc;
+            transform: translateZ(20px);
+        }
+        .nav-list li::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ffcc, #ff007a);
+            transition: width 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+        .nav-list li:hover::after, .nav-list li.active::after {
+            width: 100%;
+            opacity: 1;
+        }
+        .navbar-brand img {
+            transition: transform 0.6s ease, filter 0.6s ease;
+        }
+        .navbar-brand img:hover {
+            transform: rotateY(360deg) scale(1.3);
+            filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.9));
+        }
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 60px 20px;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.15), transparent);
+        }
+        body.light .hero {
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.25), transparent);
+        }
+        .hero img {
+            border-radius: 25px;
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #00ffcc, #ff007a) border-box;
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.6);
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+            transform-style: preserve-3d;
+        }
+        body.light .hero img {
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.4);
+        }
+        .hero img:hover {
+            transform: scale(1.15) rotateY(15deg);
+            box-shadow: 0 0 60px rgba(0, 255, 204, 0.9);
+        }
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ffcc, #ff007a, #00ffcc);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px rgba(0, 255, 204, 0.9);
+            transform: translateZ(60px);
+            animation: gradientFlow 5s ease infinite, glow 3s ease infinite;
+        }
+        body.light .hero h1 {
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+        }
+        .hero p {
+            font-size: 1.6rem;
+            margin: 25px 0;
+            color: #d1d5db;
+            text-shadow: 0 0 12px rgba(0, 255, 204, 0.6);
+            transform: translateZ(40px);
+            line-height: 1.8;
+        }
+        body.light .hero p {
+            color: #4b5563;
+            text-shadow: none;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #00ffcc, #ff007a);
+            background-size: 200%;
+            border: none;
+            padding: 18px 36px;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 700;
+            transform: translateZ(30px);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, background-position 0.4s ease;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover {
+            transform: translateZ(50px) scale(1.15);
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.9);
+            background-position: 100%;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        .portfolio {
+            padding: 120px 20px;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.92), rgba(20, 20, 20, 0.92));
+            transform: translateZ(40px);
+        }
+        body.light .portfolio {
+            background: linear-gradient(135deg, rgba(229, 231, 235, 0.92), rgba(255, 255, 255, 0.92));
+        }
+        .portfolio-card {
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.4);
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        body.light .portfolio-card {
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.3);
+        }
+        .portfolio-card:hover {
+            transform: translateZ(60px) rotateY(10deg);
+            box-shadow: 0 0 60px rgba(0, 255, 204, 0.7);
+        }
+        .portfolio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.25), transparent);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            z-index: -1;
+        }
+        .portfolio-card:hover::before {
+            opacity: 1;
+        }
+        .portfolio-card h2 {
+            font-size: 2.8rem;
+            color: #00ffcc;
+            text-shadow: 0 0 18px rgba(0, 255, 204, 0.7);
+            margin-bottom: 25px;
+        }
+        body.light .portfolio-card h2 {
+            color: #ff007a;
+            text-shadow: none;
+        }
+        .portfolio-card p {
+            font-size: 1.3rem;
+            color: #d1d5db;
+            text-shadow: 0 0 12px rgba(0, 255, 204, 0.5);
+            line-height: 1.9;
+        }
+        body.light .portfolio-card p {
+            color: #4b5563;
+            text-shadow: none;
+        }
+        .footers {
+            padding: 60px 20px;
+            background: rgba(10, 10, 10, 0.92);
+            text-align: center;
+            transform: translateZ(30px);
+        }
+        body.light .footers {
+            background: rgba(229, 231, 235, 0.92);
+        }
+        .footers p {
+            font-size: 1.3rem;
+            color: #d1d5db;
+            text-shadow: 0 0 12px rgba(0, 255, 204, 0.5);
+        }
+        body.light .footers p {
+            color: #4b5563;
+            text-shadow: none;
+        }
+        .social-icons a {
+            color: #00ffcc;
+            font-size: 2.2rem;
+            margin: 0 20px;
+            transition: transform 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+        }
+        body.light .social-icons a {
+            color: #ff007a;
+        }
+        .social-icons a:hover {
+            transform: scale(1.6) translateZ(30px);
+            color: #ff007a;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.8);
+        }
+        .theme-toggle {
+            background: linear-gradient(45deg, #00ffcc, #ff007a);
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+        }
+        .theme-toggle:hover {
+            transform: rotate(360deg) scale(1.3);
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.9);
+        }
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, #00ffcc, #ff007a);
+            border-radius: 50%;
+            animation: float 12s infinite;
+            transform: translateZ(30px);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.7);
+        }
+        @keyframes float {
+            0% { transform: translateY(0) translateZ(30px); opacity: 1; }
+            50% { transform: translateY(-200px) translateZ(50px); opacity: 0.4; }
+            100% { transform: translateY(0) translateZ(30px); opacity: 1; }
+        }
+        @keyframes glow {
+            0% { text-shadow: 0 0 25px rgba(0, 255, 204, 0.9); }
+            50% { text-shadow: 0 0 40px rgba(0, 255, 204, 1); }
+            100% { text-shadow: 0 0 25px rgba(0, 255, 204, 0.9); }
+        }
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .particle:nth-child(2) { left: 5%; animation-delay: 1s; }
+        .particle:nth-child(3) { left: 15%; animation-delay: 2s; }
+        .particle:nth-child(4) { left: 25%; animation-delay: 3s; }
+        .particle:nth-child(5) { left: 35%; animation-delay: 4s; }
+        .particle:nth-child(6) { left: 45%; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 55%; animation-delay: 6s; }
+        .particle:nth-child(8) { left: 65%; animation-delay: 7s; }
+        .particle:nth-child(9) { left: 75%; animation-delay: 8s; }
+        .particle:nth-child(10) { left: 85%; animation-delay: 9s; }
+        .particle:nth-child(11) { left: 95%; animation-delay: 10s; }
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 3.5rem; }
+            .hero p { font-size: 1.3rem; }
+            .portfolio-card h2 { font-size: 2.2rem; }
+            .portfolio-card p { font-size: 1.1rem; }
+        }
+        @media (max-width: 768px) {
+            .hero { flex-direction: column; text-align: center; padding: 40px 20px; }
+            .hero img { width: 100%; height: auto; }
+            .hero h1 { font-size: 2.8rem; }
+            .hero p { font-size: 1.1rem; }
+            .portfolio-card { margin-bottom: 40px; }
+            .nav-list { flex-wrap: wrap; gap: 12px; }
+            .portfolio { padding: 80px 20px; }
+        }
+    </style>
 </head>
-
 <body>
-	<!-- Header -->
-	<header class="navbar">
-		<div class="container">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#">
-					<img src="https://i.postimg.cc/D0tTDjq4/Black-White-Vintage-Retro-Studio-Brand-Logo.png" alt="logo">
-				</a>
-			</div>
-			<nav>
-				<ul class="nav-list">
+    <canvas id="canvas"></canvas>
+    <header class="navbar py-5">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a class="navbar-brand" href="#">
+                <img src="https://i.postimg.cc/D0tTDjq4/Black-White-Vintage-Retro-Studio-Brand-Logo.png" alt="logo" class="h-14">
+            </a>
+            <nav>
+                <ul class="nav-list flex gap-8 items-center text-lg">
                     <li class="nav-item active">Home</li>
-					<li class="nav-item"><a href="./portfolio.html">Designs</a></li>
-					<li class="nav-item"><a href="./thankyouportfolio.html">Contact</a></li>
-				</ul>
-			</nav>
-		</div>
-	</header><br>
+                    <li class="nav-item"><a href="./portfolio.html">Designs</a></li>
+                    <li class="nav-item"><a href="./thankyouportfolio.html">Contact</a></li>
+                    <li><button class="theme-toggle"><i class="fas fa-moon"></i></button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <section class="hero relative">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
+            <div class="md:w-1/2">
+                <a href="https://i.postimg.cc/mr9hy932/IMG-0954.jpg">
+                    <img src="https://i.postimg.cc/mr9hy932/IMG-0954.jpg" alt="Your Photo" class="w-full h-auto">
+                </a>
+            </div>
+            <div class="md:w-1/2">
+                <h1 class="typewriter">Hello, I'm MD Abdullah Jobayer</h1>
+                <p>I'm a Graphic Designer based in Chattagram, Bangladesh, currently pursuing my graduation and crafting visually stunning designs.</p>
+                <p><a class="btn btn-primary" href="./portfolio.html">View My Portfolio</a></p>
+            </div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </section>
+        <section class="portfolio">
+            <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="portfolio-card">
+                    <h2>About Me</h2>
+                    <p>I am a Graphic Design intern at various organizations, passionately developing my creative expertise.</p>
+                    <p><a class="btn btn-primary" href="https://pdfhost.io/v/6JJar41l4_RESUME_DESIGN">Download My Resume</a></p>
+                </div>
+                <div class="portfolio-card">
+                    <h2>My Skills</h2>
+                    <p>Graphic Design</p>
+                    <p>Web Design</p>
+                    <p>Branding</p>
+                </div>
+                <div class="portfolio-card">
+                    <h2>My Contact Information</h2>
+                    <p>MD Abdullah Jobayer</p>
+                    <p>abdullahjobayernavid@gmail.com</p>
+                    <p>+8801537474560</p>
+                </div>
+            </div>
+        </section>
+        <footer class="footers">
+            <div class="container mx-auto px-4">
+                <p>Copyright © MD Abdullah Jobayer<br>All Rights Reserved</p>
+                <div class="social-icons mt-6">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </footer>
+        <script>
+            // Theme Toggle with Icons
+            const toggleButton = document.querySelector('.theme-toggle');
+            const toggleIcon = toggleButton.querySelector('i');
+            const body = document.body;
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            if (currentTheme === 'light') {
+                body.classList.add('light');
+                toggleIcon.classList.replace('fa-moon', 'fa-sun');
+            }
 
-	<section class="hero">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-6">
-					<a href="https://i.postimg.cc/mr9hy932/IMG-0954.jpg"><img class="img-responsive"
-							src="https://i.postimg.cc/mr9hy932/IMG-0954.jpg" height="800" width="400"
-							alt="Your Photo"></a>
-				</div><br>
-				<div class="col-md-6">
-					<h1>Hello, I'm MD Abdullah Jobayer</h1>
-					<p>I'm a Graphic Designer.I live in Chattagram,Bangladesh.Currently I am doing Graduation.</p>
-					<p><a class="btn btn-primary" href="./portfolio.html">View My Portfolio</a></p>
-				</div>
-			</div>
-		</div>
-	</section>
-	<section class="portfolio">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-4">
-					<h2>About Me</h2>
-					<p>I am currently working as a Graphic Design intern in different organizations.</p>
-					<p><a class="btn btn-primary" href="https://pdfhost.io/v/6JJar41l4_RESUME_DESIGN">Download My
-							Resume</a></p>
-				</div><br>
-				<div class="col-md-4">
-					<h2>My Skills</h2>
-					<p>Graphic Design</p>
-					<p>Web Design</p>
-					<p>Branding</p>
-				</div>
-				<div class="col-md-4">
-					<h2>My Contact Information</h2>
-					<p>MD Abdullah Jobayer</p>
-					<p>abdullahjobayernavid@gmail.com</p>
-					<p>+8801537474560</p>
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- Footer -->
-	<footer class="footers">
-		<div class="container">
-			<p>Copyright © MD Abdullah Joabyer
-				<br>All Rights Reserved
-			</p>
-		</div>
-	</footer>
-	<!-- jQuery -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<!-- Bootstrap JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+            toggleButton.addEventListener('click', () => {
+                body.classList.toggle('light');
+                const newTheme = body.classList.contains('light') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                toggleIcon.classList.toggle('fa-moon');
+                toggleIcon.classList.toggle('fa-sun');
+                gsap.to(toggleButton, { rotation: 360, duration: 0.6, ease: 'power3.out' });
+            });
+
+            // Three.js Galaxy Background with Volumetric Effects
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            camera.position.z = 60;
+
+            const particles = [];
+            const particleGeometry = new THREE.SphereGeometry(0.25, 16, 16);
+            const particleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
+
+            for (let i = 0; i < 800; i++) {
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                particle.position.set(
+                    (Math.random() - 0.5) * 300,
+                    (Math.random() - 0.5) * 300,
+                    (Math.random() - 0.5) * 300
+                );
+                particle.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015,
+                    (Math.random() - 0.5) * 0.015
+                );
+                particle.scale.setScalar(Math.random() * 0.5 + 0.5);
+                scene.add(particle);
+                particles.push(particle);
+            }
+
+            const pointLight = new THREE.PointLight(0x00ffcc, 1, 100);
+            pointLight.position.set(0, 0, 50);
+            scene.add(pointLight);
+
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            function onMouseMove(event) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            }
+
+            window.addEventListener('mousemove', onMouseMove);
+
+            function animateBackground() {
+                requestAnimationFrame(animateBackground);
+                raycaster.setFromCamera(mouse, camera);
+                particles.forEach(particle => {
+                    particle.position.add(particle.velocity);
+                    if (particle.position.z > 150) particle.position.z = -150;
+                    if (particle.position.z < -150) particle.position.z = 150;
+                    const intersects = raycaster.intersectObject(particle);
+                    if (intersects.length > 0) {
+                        particle.material.color.set(0xff007a);
+                        particle.scale.setScalar(2);
+                    } else {
+                        particle.material.color.set(0x00ffcc);
+                        particle.scale.setScalar(Math.random() * 0.5 + 0.5);
+                    }
+                    particle.position.x += Math.sin(Date.now() * 0.001) * 0.01;
+                    particle.position.y += Math.cos(Date.now() * 0.001) * 0.01;
+                });
+                renderer.render(scene, camera);
+            }
+            animateBackground();
+
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                }, 100);
+            });
+
+            // Typewriter Effect for Hero Heading
+            const typewriterText = "Hello, I'm MD Abdullah Jobayer";
+            const typewriterElement = document.querySelector('.typewriter');
+            let i = 0;
+            function typeWriter() {
+                if (i < typewriterText.length) {
+                    typewriterElement.innerHTML = typewriterText.substring(0, i + 1) + '<span style="color: #00ffcc; text-shadow: 0 0 10px #00ffcc;">|</span>';
+                    i++;
+                    setTimeout(typeWriter, 80);
+                } else {
+                    typewriterElement.innerHTML = typewriterText;
+                }
+            }
+            setTimeout(typeWriter, 300);
+
+            // GSAP Animations
+            gsap.registerPlugin(ScrollTrigger);
+
+            gsap.from('.hero img', {
+                opacity: 0,
+                x: -300,
+                duration: 1.8,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.hero h1', {
+                opacity: 0,
+                y: 150,
+                duration: 1.8,
+                delay: 0.3,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.hero p', {
+                opacity: 0,
+                y: 150,
+                duration: 1.8,
+                delay: 0.6,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.btn-primary', {
+                opacity: 0,
+                y: 150,
+                duration: 1.8,
+                delay: 0.9,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.particle', {
+                opacity: 0,
+                scale: 0,
+                duration: 2.5,
+                stagger: 0.15,
+                ease: 'elastic.out(1, 0.3)'
+            });
+
+            gsap.from('.portfolio-card', {
+                scrollTrigger: { trigger: '.portfolio', start: 'top 75%' },
+                opacity: 0,
+                y: 150,
+                rotateY: 90,
+                duration: 1.8,
+                stagger: 0.4,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.footers p', {
+                scrollTrigger: { trigger: '.footers', start: 'top 80%' },
+                opacity: 0,
+                y: 80,
+                duration: 1.8,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.social-icons a', {
+                scrollTrigger: { trigger: '.footers', start: 'top 80%' },
+                opacity: 0,
+                y: 80,
+                duration: 1.8,
+                stagger: 0.3,
+                ease: 'power4.out'
+            });
+
+            // Navigation Active State
+            const navLinks = document.querySelectorAll('.nav-item');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+
+            // 3D Tilt Effect for Portfolio Cards
+            document.querySelectorAll('.portfolio-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    card.style.transform = `translateZ(60px) rotateY(${x / 15}deg) rotateX(${-y / 15}deg)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateZ(0) rotateY(0deg) rotateX(0deg)';
+                });
+            });
+
+            // Particle Trails for Social Icons
+            document.querySelectorAll('.social-icons a').forEach(icon => {
+                icon.addEventListener('mouseenter', () => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.position = 'absolute';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = '0';
+                    icon.appendChild(particle);
+                    setTimeout(() => particle.remove(), 12000);
+                });
+            });
+
+            // Parallax Effect on Mouse Move
+            document.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth - 0.5) * 15;
+                const y = (e.clientY / window.innerHeight - 0.5) * 15;
+                gsap.to('.hero img, .portfolio-card', {
+                    x: x,
+                    y: y,
+                    duration: 0.7,
+                    ease: 'power3.out'
+                });
+            });
+        </script>
 </body>
-
 </html>
