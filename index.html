@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Abdullah Jobayer's Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://i.postimg.cc/tRWQVsJY/yourbrother.png" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #111827;
+            color: white;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        body.light {
+            background-color: #f9fafb;
+            color: #111827;
+        }
+        .glassmorphic {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        .glassmorphic-dark {
+            background: rgba(17, 24, 39, 0.25);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        body.light .glassmorphic-dark {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .custom-cursor {
+            position: fixed;
+            width: 28px;
+            height: 28px;
+            border: 2px solid #a855f7;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+        }
+        body.light .custom-cursor {
+            border-color: #6b21a8;
+            box-shadow: 0 0 15px rgba(107, 33, 168, 0.5);
+        }
+        .custom-cursor.hovered {
+            transform: scale(1.7);
+            background: rgba(168, 85, 247, 0.2);
+        }
+        .cursor-particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: #a855f7;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
+        }
+        body.light .cursor-particle {
+            background: #6b21a8;
+            box-shadow: 0 0 10px rgba(107, 33, 168, 0.7);
+        }
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+        }
+        .theme-toggle {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+        }
+        .theme-toggle img {
+            width: 24px;
+            height: 24px;
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+        .theme-toggle:hover img {
+            opacity: 0.8;
+            transform: scale(1.2);
+        }
+        body.light .theme-toggle img {
+            filter: none; /* Reset filter for light mode */
+        }
+        body:not(.light) .theme-toggle img {
+            filter: brightness(0) invert(1); /* Make black icon white in dark mode */
+        }
+        .glass-btn {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+        }
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+        }
+        .glass-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        .navbar-link {
+            position: relative;
+            transition: color 0.3s ease, transform 0.3s ease;
+            transform: translateZ(0);
+        }
+        .navbar-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #a855f7;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+        }
+        body.light .navbar-link::after {
+            background: #6b21a8;
+            box-shadow: 0 0 8px rgba(107, 33, 168, 0.5);
+        }
+        .navbar-link:hover::after {
+            width: 80%;
+        }
+        .navbar-link:hover::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #a855f7;
+            border-radius: 50%;
+            animation: particleTrail 0.8s ease;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
+        }
+        body.light .navbar-link:hover::before {
+            background: #6b21a8;
+            box-shadow: 0 0 10px rgba(107, 33, 168, 0.7);
+        }
+        .navbar-link:hover {
+            transform: translateZ(10px);
+        }
+        .social-icon {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.3) translateZ(20px);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
+        }
+        body.light .social-icon:hover {
+            box-shadow: 0 0 15px rgba(107, 33, 168, 0.7);
+        }
+        .section-card {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+        }
+        .section-card:hover {
+            transform: perspective(1000px) translateZ(50px);
+            box-shadow: 0 0 50px rgba(168, 85, 247, 0.4);
+        }
+        body.light .section-card:hover {
+            box-shadow: 0 0 50px rgba(107, 33, 168, 0.3);
+        }
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: -1;
+        }
+        .section-card:hover::before {
+            opacity: 1;
+        }
+        .footer-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #a855f7;
+            border-radius: 50%;
+            opacity: 0;
+            animation: footerSpark 1.2s ease infinite;
+        }
+        body.light .footer-particle {
+            background: #6b21a8;
+        }
+        #mobile-menu {
+            position: fixed;
+            top: 16px;
+            right: 0;
+            width: 75%;
+            height: calc(100% - 4rem);
+            transform: translateX(100%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+            padding: 2rem;
+            box-shadow: -10px 0 20px rgba(0, 0, 0, 0.3);
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+        #menu-toggle i {
+            transition: transform 0.4s ease;
+        }
+        #menu-toggle.open i {
+            transform: rotate(45deg);
+        }
+        nav {
+            min-width: 0;
+        }
+        nav ul {
+            flex-shrink: 0;
+        }
+        nav.overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        nav.overflow-x-auto::-webkit-scrollbar {
+            display: none;
+        }
+        @keyframes particleTrail {
+            0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-50px); opacity: 0; }
+        }
+        @keyframes spark {
+            0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-40px); opacity: 0; }
+        }
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(168, 85, 247, 0.7); }
+            100% { text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+        }
+        @keyframes footerSpark {
+            0% { transform: translateY(0); opacity: 0.8; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+        @media (max-width: 1024px) {
+            .section-card { padding: 1.5rem; }
+            h2 { font-size: 2.5rem; }
+            p, a { font-size: 1rem; }
+            img { max-width: 300px; }
+            .theme-toggle { width: 24px; height: 24px; }
+            .theme-toggle img { width: 20px; height: 20px; }
+            .social-icon { padding: 0.75rem; }
+            .social-icon i { font-size: 1.5rem; }
+        }
+        @media (max-width: 640px) {
+            .section-card { padding: 1rem; }
+            h2 { font-size: 2rem; }
+            p, a { font-size: 0.9rem; }
+            img { max-width: 250px; }
+            .footer-content { padding: 1rem; }
+            .social-icon { padding: 0.5rem; }
+            .social-icon i { font-size: 1.25rem; }
+            #menu-toggle {
+                display: block;
+            }
+            nav {
+                display: none;
+            }
+            #mobile-menu.open {
+                transform: translateX(0);
+            }
+        }
+        @media (min-width: 641px) {
+            #menu-toggle {
+                display: none;
+            }
+            nav {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white transition-all duration-500 light:bg-gray-50 light:text-gray-900">
+    <canvas id="canvas"></canvas>
+    <div class="custom-cursor"></div>
+    <header class="fixed top-0 left-0 w-full z-50 glassmorphic-dark light:glassmorphic py-4 shadow-lg">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <a class="flex items-center" href="#">
+                <img src="https://i.postimg.cc/D0tTDjq4/Black-White-Vintage-Retro-Studio-Brand-Logo.png" alt="logo" class="h-10 sm:h-12 transition-transform duration-500 hover:scale-110 hover:drop-shadow-[0_0_12px_rgba(168,85,247,0.7)] light:hover:drop-shadow-[0_0_12px_rgba(107,33,168,0.7)]">
+            </a>
+            <nav class="flex items-center space-x-4 sm:space-x-6 overflow-x-auto">
+                <ul class="flex gap-4 sm:gap-6 text-base font-medium whitespace-nowrap">
+                    <li><span class="navbar-link cursor-pointer hover:text-purple-500 light:hover:text-purple-800">Home</span></li>
+                    <li><a href="./portfolio.html" class="navbar-link hover:text-purple-500 light:hover:text-purple-800">Portfolio</a></li>
+                    <li><a href="./thankyouportfolio.html" class="navbar-link hover:text-purple-500 light:hover:text-purple-800">Contact</a></li>
+                </ul>
+                <div class="theme-toggle ml-4">
+                    <img src="https://img.icons8.com/?size=100&id=59841&format=png&color=FFFFFF" alt="Theme Toggle">
+                </div>
+            </nav>
+            <button class="lg:hidden text-purple-500 light:text-purple-800 focus:outline-none sm:hidden" id="menu-toggle" aria-label="Toggle mobile menu">
+                <i class="fas fa-bars text-xl sm:text-2xl"></i>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden lg:hidden glassmorphic-dark light:glassmorphic fixed top-16 right-0 w-3/4 h-[calc(100%-4rem)] transform translate-x-full transition-transform duration-300">
+            <ul class="flex flex-col gap-6 text-lg font-medium p-8">
+                <li><span class="navbar-link cursor-pointer hover:text-purple-500 light:hover:text-purple-800">Home</span></li>
+                <li><a href="./portfolio.html" class="navbar-link hover:text-purple-500 light:hover:text-purple-800">Portfolio</a></li>
+                <li><a href="./thankyouportfolio.html" class="navbar-link hover:text-purple-500 light:hover:text-purple-800">Contact</a></li>
+                <li>
+                    <div class="theme-toggle">
+                        <img src="https://img.icons8.com/?size=100&id=59841&format=png&color=FFFFFF" alt="Theme Toggle">
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <main class="pt-20 sm:pt-24">
+        <section class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div class="section-card glassmorphic-dark light:glassmorphic p-6 sm:p-8 lg:p-12 rounded-3xl w-full max-w-7xl relative">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-purple-500 light:text-purple-800 mb-6 animate-glow">Welcome</h2>
+                <div class="flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
+                    <a href="https://i.postimg.cc/mr9hy932/IMG-0954.jpg" class="flex-shrink-0">
+                        <img src="https://i.postimg.cc/mr9hy932/IMG-0954.jpg" alt="Your Photo" class="rounded-2xl border-2 border-purple-500 light:border-purple-800 w-full max-w-[250px] sm:max-w-[300px] lg:max-w-[400px] h-auto transition-transform duration-500 hover:scale-105 hover:shadow-[0_0_40px_rgba(168,85,247,0.7)] light:hover:shadow-[0_0_40px_rgba(107,33,168,0.7)]">
+                    </a>
+                    <div class="flex-1">
+                        <p class="text-base sm:text-lg lg:text-xl text-gray-300 light:text-gray-700 mb-5 leading-relaxed">Hello, I'm MD Abdullah Jobayer, a Graphic Designer based in Chattagram, Bangladesh. Currently pursuing my graduation, I specialize in creating innovative and professional design solutions that captivate and inspire.</p>
+                        <a href="./portfolio.html" class="glass-btn glassmorphic-dark light:glassmorphic inline-block px-6 py-3 rounded-full text-purple-500 light:text-purple-800 font-semibold text-base border-2 border-purple-500 light:border-purple-800 hover:text-white light:hover:text-gray-900">
+                            View My Portfolio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div class="section-card glassmorphic-dark light:glassmorphic p-6 sm:p-8 lg:p-12 rounded-3xl w-full max-w-7xl relative">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-purple-500 light:text-purple-800 mb-6 animate-glow">About Me</h2>
+                <p class="text-base sm:text-lg lg:text-xl text-gray-300 light:text-gray-700 mb-5 leading-relaxed">I am a Graphic Design intern at various organizations, dedicated to crafting visually compelling and effective design solutions. My passion for creativity drives me to deliver impactful designs that resonate with audiences.</p>
+                <a href="https://pdfhost.io/v/6JJar41l4_RESUME_DESIGN" class="glass-btn glassmorphic-dark light:glassmorphic inline-block px-6 py-3 rounded-full text-purple-500 light:text-purple-800 font-semibold text-base border-2 border-purple-500 light:border-purple-800 hover:text-white light:hover:text-gray-900">
+                    Download My Resume
+                </a>
+            </div>
+        </section>
+        <section class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div class="section-card glassmorphic-dark light:glassmorphic p-6 sm:p-8 lg:p-12 rounded-3xl w-full max-w-7xl relative">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-purple-500 light:text-purple-800 mb-6 animate-glow">My Skills</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <p class="text-base sm:text-lg text-gray-300 light:text-gray-700 bg-[rgba(255,255,255,0.05)] light:bg-[rgba(0,0,0,0.05)] p-3 rounded-xl">Graphic Design</p>
+                    <p class="text-base sm:text-lg text-gray-300 light:text-gray-700 bg-[rgba(255,255,255,0.05)] light:bg-[rgba(0,0,0,0.05)] p-3 rounded-xl">Web Design</p>
+                    <p class="text-base sm:text-lg text-gray-300 light:text-gray-700 bg-[rgba(255,255,255,0.05)] light:bg-[rgba(0,0,0,0.05)] p-3 rounded-xl">Branding</p>
+                </div>
+            </div>
+        </section>
+        <section class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div class="section-card glassmorphic-dark light:glassmorphic p-6 sm:p-8 lg:p-12 rounded-3xl w-full max-w-7xl relative">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-purple-500 light:text-purple-800 mb-6 animate-glow">Contact Information</h2>
+                <p class="text-base sm:text-lg text-gray-300 light:text-gray-700 mb-3">MD Abdullah Jobayer</p>
+                <p class="text-base sm:text-lg text-gray-300 light:text-gray-700 mb-3">abdullahjobayernavid@gmail.com</p>
+                <p class="text-base sm:text-lg text-gray-300 light:text-gray-700 mb-5">+8801537474560</p>
+                <div class="flex gap-4 flex-wrap">
+                    <a href="#" class="social-icon glassmorphic-dark light:glassmorphic p-3 rounded-full text-purple-500 light:text-purple-800" aria-label="GitHub">
+                        <i class="fab fa-github text-xl sm:text-2xl"></i>
+                    </a>
+                    <a href="#" class="social-icon glassmorphic-dark light:glassmorphic p-3 rounded-full text-purple-500 light:text-purple-800" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin text-xl sm:text-2xl"></i>
+                    </a>
+                    <a href="#" class="social-icon glassmorphic-dark light:glassmorphic p-3 rounded-full text-purple-500 light:text-purple-800" aria-label="Twitter">
+                        <i class="fab fa-twitter text-xl sm:text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <footer class="py-10 sm:py-12 relative overflow-hidden">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="footer-content glassmorphic-dark light:glassmorphic p-6 sm:p-8 rounded-2xl relative border-t-4 border-b-4 border-gradient-to-r from-purple-500 to-purple-800">
+                    <div class="footer-particle" style="left: 10%; animation-delay: 0s;"></div>
+                    <div class="footer-particle" style="left: 30%; animation-delay: 0.3s;"></div>
+                    <div class="footer-particle" style="left: 50%; animation-delay: 0.6s;"></div>
+                    <div class="footer-particle" style="left: 70%; animation-delay: 0.9s;"></div>
+                    <div class="footer-particle" style="left: 90%; animation-delay: 1.2s;"></div>
+                    <p class="text-base sm:text-lg text-gray-300 light:text-gray-700 mb-4 animate-glow text-center">Copyright © <span id="copyright-year"></span> MD Abdullah Jobayer<br>All Rights Reserved</p>
+                    <div class="flex justify-center gap-4 sm:gap-6 flex-wrap mb-4">
+                        <a href="#" class="social-icon glassmorphic-dark light:glassmorphic p-3 rounded-full text-purple-500 light:text-purple-800" aria-label="GitHub">
+                            <i class="fab fa-github text-xl sm:text-2xl"></i>
+                        </a>
+                        <a href="#" class="social-icon glassmorphic-dark light:glassmorphic p-3 rounded-full text-purple-500 light:text-purple-800" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin text-xl sm:text-2xl"></i>
+                        </a>
+                        <a href="#" class="social-icon glassmorphic-dark light:glassmorphic p-3 rounded-full text-purple-500 light:text-purple-800" aria-label="Twitter">
+                            <i class="fab fa-twitter text-xl sm:text-2xl"></i>
+                        </a>
+                    </div>
+                    <div class="text-center">
+                        <a href="#" class="glass-btn glassmorphic-dark light:glassmorphic inline-block px-6 py-3 rounded-full text-purple-500 light:text-purple-800 font-semibold text-base border-2 border-purple-500 light:border-purple-800 hover:text-white light:hover:text-gray-900">
+                            Back to Top
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script>
+        // Theme Toggle Logic
+        const toggleButtons = document.querySelectorAll('.theme-toggle');
+        const toggleIcons = document.querySelectorAll('.theme-toggle img');
+        const body = document.body;
+        const darkModeIcon = "https://img.icons8.com/?size=100&id=59841&format=png&color=FFFFFF"; // White moon
+        const lightModeIcon = "https://img.icons8.com/?size=100&id=648&format=png&color=000000"; // Black sun
+
+        function setTheme(isLight) {
+            body.classList.toggle('light', isLight);
+            toggleIcons.forEach(img => {
+                img.src = isLight ? lightModeIcon : darkModeIcon;
+            });
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            gsap.to(toggleIcons, {
+                scale: 1.2,
+                duration: 0.2,
+                ease: 'power3.out',
+                yoyo: true,
+                repeat: 1
+            });
+        }
+
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(currentTheme === 'light');
+
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const isLight = !body.classList.contains('light');
+                setTheme(isLight);
+            });
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = menuToggle.querySelector('i');
+
+        menuToggle.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('open');
+            mobileMenu.classList.toggle('open');
+            menuToggle.classList.toggle('open');
+            menuIcon.classList.toggle('fa-bars');
+            menuIcon.classList.toggle('fa-times');
+            gsap.to(mobileMenu, {
+                x: isOpen ? '100%' : 0,
+                duration: 0.4,
+                ease: 'power3.out'
+            });
+            gsap.from(mobileMenu.querySelectorAll('li'), {
+                opacity: 0,
+                y: 20,
+                stagger: 0.1,
+                duration: 0.5,
+                ease: 'power3.out',
+                delay: isOpen ? 0 : 0.2
+            });
+        });
+
+        // Three.js Particle Nebula Background
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        camera.position.z = 60;
+
+        const particles = [];
+        const particleGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const particleMaterial = new THREE.MeshBasicMaterial({ color: 0xa855f7 });
+
+        for (let i = 0; i < 500; i++) {
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+            const radius = 25 + Math.random() * 25;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            particle.position.set(
+                radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.sin(phi) * Math.sin(theta),
+                radius * Math.cos(phi)
+            );
+            particle.velocity = new THREE.Vector3(
+                (Math.random() - 0.5) * 0.015,
+                (Math.random() - 0.5) * 0.015,
+                (Math.random() - 0.5) * 0.015
+            );
+            particle.scale.setScalar(Math.random() * 0.5 + 0.5);
+            scene.add(particle);
+            particles.push(particle);
+        }
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        window.addEventListener('mousemove', onMouseMove);
+
+        function animateBackground() {
+            requestAnimationFrame(animateBackground);
+            raycaster.setFromCamera(mouse, camera);
+            particles.forEach(particle => {
+                particle.position.add(particle.velocity);
+                const dist = particle.position.length();
+                if (dist > 50) particle.position.setLength(25);
+                const intersects = raycaster.intersectObject(particle);
+                if (intersects.length > 0) {
+                    particle.material.color.set(0xd8b4fe);
+                    particle.scale.setScalar(1.5);
+                } else {
+                    particle.material.color.set(0xa855f7);
+                    particle.scale.setScalar(Math.random() * 0.5 + 0.5);
+                }
+            });
+            renderer.render(scene, camera);
+        }
+        animateBackground();
+
+        // Dynamic Copyright Year
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
+        // GSAP Animations - Ensure DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            gsap.utils.toArray('.section-card').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reverse'
+                    },
+                    opacity: 0,
+                    y: 100,
+                    scale: 0.95,
+                    duration: 1.5,
+                    ease: 'power4.out',
+                    delay: i * 0.2
+                });
+            });
+
+            gsap.from('img', {
+                scrollTrigger: { 
+                    trigger: '.section-card:first-child', 
+                    start: 'top 85%' 
+                },
+                opacity: 0,
+                x: -150,
+                duration: 1.5,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.glass-btn', {
+                scrollTrigger: { 
+                    trigger: '.section-card', 
+                    start: 'top 85%' 
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1.5,
+                stagger: 0.3,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.social-icon', {
+                scrollTrigger: { 
+                    trigger: '.section-card:last-child', 
+                    start: 'top 85%' 
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1.5,
+                stagger: 0.2,
+                ease: 'bounce.out'
+            });
+
+            gsap.from('.footer-content', {
+                scrollTrigger: { 
+                    trigger: 'footer', 
+                    start: 'top 85%' 
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1.5,
+                ease: 'power4.out'
+            });
+
+            gsap.from('.footer-content .social-icon', {
+                scrollTrigger: { 
+                    trigger: 'footer', 
+                    start: 'top 85%' 
+                },
+                opacity: 0,
+                y: 30,
+                duration: 1.5,
+                stagger: 0.2,
+                ease: 'bounce.out'
+            });
+
+            gsap.from('.footer-content .glass-btn', {
+                scrollTrigger: { 
+                    trigger: 'footer', 
+                    start: 'top 85%' 
+                },
+                opacity: 0,
+                y: 30,
+                duration: 1.5,
+                ease: 'power4.out',
+                delay: 0.6
+            });
+        });
+
+        // 3D Tilt Effect for Cards and Social Icons
+        document.querySelectorAll('.section-card, .social-icon').forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                el.style.transform = `perspective(1000px) translateZ(20px) rotateY(${x / 25}deg) rotateX(${-y / 25}deg)`;
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'perspective(1000px) translateZ(0) rotateY(0deg) rotateX(0deg)';
+            });
+        });
+
+        // Super Animated Cursor
+        const cursor = document.querySelector('.custom-cursor');
+        let lastX = 0, lastY = 0;
+        document.addEventListener('mousemove', (e) => {
+            const deltaX = e.clientX - lastX;
+            const deltaY = e.clientY - lastY;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
+
+            const particle = document.createElement('div');
+            particle.className = 'cursor-particle';
+            particle.style.left = `${e.clientX}px`;
+            particle.style.top = `${e.clientY}px`;
+            document.body.appendChild(particle);
+            gsap.to(particle, {
+                x: deltaX * 0.4,
+                y: deltaY * 0.4,
+                opacity: 0,
+                scale: 0,
+                duration: 0.7,
+                ease: 'power3.out',
+                onComplete: () => particle.remove()
+            });
+        });
+
+        // Cursor Hover Effects
+        document.querySelectorAll('a, button, .navbar-link').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        // Particle Sparks for Buttons and Icons
+        document.querySelectorAll('.glass-btn, .social-icon').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                const particle = document.createElement('div');
+                particle.className = 'cursor-particle';
+                particle.style.position = 'absolute';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = '0';
+                el.appendChild(particle);
+                gsap.to(particle, {
+                    y: -40,
+                    opacity: 0,
+                    duration: 0.7,
+                    ease: 'power3.out',
+                    onComplete: () => particle.remove()
+                });
+            });
+        });
+
+        // Navbar Active State
+        const navLinks = document.querySelectorAll('.navbar-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.forEach(l => l.classList.remove('text-purple-500', 'light:text-purple-800'));
+                link.classList.add('text-purple-500', 'light:text-purple-800');
+            });
+        });
+
+        // Resize Handler
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
